@@ -1,0 +1,28 @@
+version: "2"
+
+run:
+  timeout: 5m
+  go: '1.24'
+
+linters:
+  default: none
+  enable:
+    # 基本的なエラー検出
+    - errcheck      # エラーハンドリング漏れを検出（Go開発では必須）
+    - govet         # Go公式の静的解析ツール（型安全性等をチェック）
+    - staticcheck   # 高度な静的解析（バグやパフォーマンス問題を検出）
+    - ineffassign   # 無効な代入を検出（メモリリークやロジックエラー防止）
+    - unused        # 未使用のコード・変数を検出（コード品質向上）
+    
+    # セキュリティ
+    - gosec         # セキュリティ脆弱性を検出（本番環境での安全性確保）
+    
+    # コード品質
+    - gocognit      # 関数の複雑度チェック（保守性向上）
+    - goconst       # 繰り返し文字列の定数化提案（保守性・可読性向上）
+    - misspell      # スペルミスチェック（ドキュメント品質向上）
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

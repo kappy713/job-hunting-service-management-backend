@@ -8,7 +8,6 @@ import (
 )
 
 type User struct {
-	// SupabaseのAuth IDを設定（自動生成なし）
 	UserID        uuid.UUID      `gorm:"type:uuid;primarykey" json:"user_id"`
 	LastName      string         `gorm:"not null;size:50" json:"last_name"`
 	FirstName     string         `gorm:"not null;size:50" json:"first_name"`

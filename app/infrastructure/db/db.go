@@ -11,11 +11,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type DB struct {
-	*gorm.DB
-}
-
-func New() (*DB, error) {
+func NewDB() (*gorm.DB, error) {
 	// 環境変数読み込み
 	if err := godotenv.Load(); err != nil {
 		log.Println("Warning: .env file not found, using environment variables")
@@ -47,11 +43,11 @@ func New() (*DB, error) {
 
 	log.Println("Successfully connected to database")
 
-	return &DB{db}, nil
+	return db, nil
 }
 
-func (d *DB) Close() error {
-	sqlDB, err := d.DB.DB()
+func Close(db *gorm.DB) error {
+	sqlDB, err := db.DB()
 	if err != nil {
 		return err
 	}

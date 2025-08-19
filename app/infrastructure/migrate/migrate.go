@@ -6,16 +6,18 @@ import (
 
 	"job-hunting-service-management-backend/app/infrastructure/db"
 	"job-hunting-service-management-backend/app/internal/entity"
+
+	"gorm.io/gorm"
 )
 
 func Run() error {
 	// DB接続
-	database, err := db.New()
+	database, err := db.NewDB()
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer func() {
-		if err := database.Close(); err != nil {
+		if err := db.Close(database); err != nil {
 			log.Printf("Failed to close database connection: %v", err)
 		}
 	}()
@@ -61,7 +63,7 @@ func Run() error {
 	return nil
 }
 
-func verifyMigration(database *db.DB, entities []interface{}) error {
+func verifyMigration(database *gorm.DB, entities []interface{}) error {
 	for _, ent := range entities {
 		if !database.Migrator().HasTable(ent) {
 			return fmt.Errorf("table does not exist for entity: %T", ent)

@@ -4,33 +4,32 @@ import (
 	"log"
 
 	"job-hunting-service-management-backend/app/infrastructure/db"
-
-	"github.com/gin-gonic/gin"
+	"job-hunting-service-management-backend/app/internal/handler"
+	"job-hunting-service-management-backend/app/internal/repository"
+	"job-hunting-service-management-backend/app/internal/router"
+	"job-hunting-service-management-backend/app/internal/usecase"
 )
 
 func main() {
 	// DB接続
-	database, err := db.New()
+	database, err := db.NewDB()
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer func() {
-		if err := database.Close(); err != nil {
+		if err := db.Close(database); err != nil {
 			log.Printf("Failed to close database connection: %v", err)
 		}
 	}()
 
 	log.Println("Database connection successful!")
 
-	// Ginルーター設定
-	r := gin.Default()
+	sampleUserRepository := repository.NewSampleUserRepository(database)
+	sampleUserUsecase := usecase.NewSampleUserUsecase(sampleUserRepository)
+	sampleUserHandler := handler.NewSampleUserHandler(sampleUserUsecase)
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello World",
-			"status":  "Database connected successfully",
-		})
-	})
+	// ルーター設定
+	r := router.NewRouter(sampleUserHandler)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal("Failed to start server:", err)

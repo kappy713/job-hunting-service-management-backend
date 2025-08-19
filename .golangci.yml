@@ -1,11 +1,9 @@
 version: "2"
-
 run:
   timeout: 5m
   go: '1.24'
 
 linters:
-  default: none
   enable:
     # 基本的なエラー検出
     - errcheck      # エラーハンドリング漏れを検出（Go開発では必須）
@@ -21,8 +19,7 @@ linters:
     - gocognit      # 関数の複雑度チェック（保守性向上）
     - goconst       # 繰り返し文字列の定数化提案（保守性・可読性向上）
     - misspell      # スペルミスチェック（ドキュメント品質向上）
-
-formatters:
-  enable:
-    - gofmt
-    - goimports
+    
+    # フォーマッター
+    - gofmt         # Go標準のフォーマッター
+    - goimports     # import文の整理

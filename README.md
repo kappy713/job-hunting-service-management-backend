@@ -14,9 +14,15 @@ git clone git@github.com:kappy713/job-hunting-service-management-backend.git
 go mod tidy
 ```
 
-### 3. 開発用サーバーの起動
+### 3. 環境変数の設定
 ```
-go run main.go
+DATABASE_URL=DATABASE_URL
+```
+
+### 4. 開発用サーバーの起動
+※環境変数が正しく設定されていない場合は開発用サーバーが起動しません※
+```
+go run app/cmd/server/main.go
 ```
 
 上記コマンド実行後、http://localhost:8080/ にアクセス<br>

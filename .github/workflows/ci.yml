@@ -11,9 +11,8 @@ jobs:
   golangci-lint:
     runs-on: ubuntu-latest
     permissions:
-      checks: write
       contents: read
-      pull-requests: write
+      pull-requests: read
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
@@ -22,11 +21,10 @@ jobs:
           go-version: "1.24"
       - name: Install dependencies
         run: go mod tidy
-      - uses: reviewdog/action-golangci-lint@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          go_version: "1.24"
-          reporter: github-pr-review
-          level: warning
-          golangci_lint_flags: "--config=.golangci.yml"
-          fail_level: error
+          version: latest
+          args: --config=.golangci.yml
+          only-new-issues: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}

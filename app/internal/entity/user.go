@@ -11,8 +11,10 @@ type User struct {
 	UserID        uuid.UUID      `gorm:"type:uuid;primarykey" json:"user_id"`
 	LastName      string         `gorm:"not null;size:50" json:"last_name"`
 	FirstName     string         `gorm:"not null;size:50" json:"first_name"`
+	BirthDate     *time.Time     `gorm:"type:date" json:"birth_date,omitempty"`
 	Age           int            `gorm:"check:age >= 0 AND age <= 150" json:"age"`
 	University    string         `gorm:"size:50" json:"university"`
+	Category      string         `gorm:"size:100" json:"category"`
 	Faculty       string         `gorm:"size:50" json:"faculty"`
 	Grade         int            `gorm:"check:grade >= 1 AND grade <= 10" json:"grade"`
 	TargetJobType string         `gorm:"not null;size:50" json:"target_job_type"`

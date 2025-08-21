@@ -8,9 +8,15 @@ import (
 	"job-hunting-service-management-backend/app/internal/repository"
 	"job-hunting-service-management-backend/app/internal/router"
 	"job-hunting-service-management-backend/app/internal/usecase"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found or failed to load .env file:", err)
+	}
+
 	// DB接続
 	database, err := db.NewDB()
 	if err != nil {

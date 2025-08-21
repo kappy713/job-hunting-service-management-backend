@@ -27,6 +27,12 @@ func Run() error {
 	entities := []interface{}{
 		&entity.SampleUser{},
 		&entity.User{},
+		&entity.Log{},
+		&entity.Supporterz{},
+		&entity.CareerSelect{},
+		&entity.OneCareer{},
+		&entity.LevtechRookie{},
+		&entity.Mynavi{},
 		// 新しいエンティティはここに追加
 	}
 

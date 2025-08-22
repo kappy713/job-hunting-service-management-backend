@@ -55,9 +55,9 @@ func (u *mynaviUsecase) logFieldUpdates(c *gin.Context, userID uuid.UUID, req en
 
 	// 各フィールドが空でなければログを記録
 	if req.SelfPromotion != "" {
-		u.lu.UpsertLog(c, userID, targetTable, "self_promotion")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "self_promotion")
 	}
 	if req.FuturePlan != "" {
-		u.lu.UpsertLog(c, userID, targetTable, "future_plan")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "future_plan")
 	}
 }

@@ -65,36 +65,36 @@ func (u *supporterzUsecase) logFieldUpdates(c *gin.Context, userID uuid.UUID, re
 
 	// 各フィールドが空でなければログを記録
 	if req.CareerVision != "" {
-		u.lu.UpsertLog(c, userID, targetTable, "career_vision")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "career_vision")
 	}
 	if req.SelfPromotion != "" {
-		u.lu.UpsertLog(c, userID, targetTable, "self_promotion")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "self_promotion")
 	}
 	if len(req.Skills) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "skills")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "skills")
 	}
 	if len(req.SkillDescriptions) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "skill_descriptions")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "skill_descriptions")
 	}
 	if len(req.InternExperiences) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "intern_experiences")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "intern_experiences")
 	}
 	if len(req.InternExperienceDescriptions) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "intern_experience_descriptions")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "intern_experience_descriptions")
 	}
 	if len(req.Products) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "products")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "products")
 	}
 	if len(req.ProductTechStacks) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "product_tech_stacks")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "product_tech_stacks")
 	}
 	if len(req.ProductDescriptions) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "product_descriptions")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "product_descriptions")
 	}
 	if len(req.Researches) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "researches")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "researches")
 	}
 	if len(req.ResearchDescriptions) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "research_descriptions")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "research_descriptions")
 	}
 }

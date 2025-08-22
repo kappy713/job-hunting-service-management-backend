@@ -63,30 +63,30 @@ func (u *oneCareerUsecase) logFieldUpdates(c *gin.Context, userID uuid.UUID, req
 
 	// 各フィールドが空でなければログを記録
 	if len(req.Skills) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "skills")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "skills")
 	}
 	if len(req.SkillDescriptions) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "skill_descriptions")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "skill_descriptions")
 	}
 	if len(req.Researches) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "researches")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "researches")
 	}
 	if len(req.ResearchDescriptions) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "research_descriptions")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "research_descriptions")
 	}
 	if len(req.InternExperiences) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "intern_experiences")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "intern_experiences")
 	}
 	if len(req.InternExperienceDescriptions) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "intern_experience_descriptions")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "intern_experience_descriptions")
 	}
 	if len(req.Products) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "products")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "products")
 	}
 	if len(req.ProductDescriptions) > 0 {
-		u.lu.UpsertLog(c, userID, targetTable, "product_descriptions")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "product_descriptions")
 	}
 	if req.EngineerAspiration != "" {
-		u.lu.UpsertLog(c, userID, targetTable, "engineer_aspiration")
+		u.lu.LogFieldUpdateWithErrorHandling(userID, targetTable, "engineer_aspiration")
 	}
 }

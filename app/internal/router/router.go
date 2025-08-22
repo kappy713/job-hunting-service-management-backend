@@ -18,6 +18,7 @@ func NewRouter(
 	lrh handler.LevtechRookieHandler,
 	mh handler.MynaviHandler,
 	och handler.OneCareerHandler,
+	lh handler.LogHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -70,6 +71,9 @@ func NewRouter(
 	// ワンキャリア
 	r.GET("/api/one-career/:id", och.GetOneCareerByID)
 	r.POST("/api/one-career", och.CreateOrUpdateOneCareer)
+
+	// ログ
+	r.GET("/api/log/:id", lh.GetLogsByUserID)
 
 	return r
 }

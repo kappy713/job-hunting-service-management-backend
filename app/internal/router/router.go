@@ -8,6 +8,7 @@ import (
 
 func NewRouter(
 	suh handler.SampleUserHandler,
+	uh handler.UserHandler, // 新しいハンドラーを追加
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -20,6 +21,12 @@ func NewRouter(
 
 	// サンプルユーザー
 	r.GET("/api/sample-users", suh.GetAllSampleUsers)
+
+	// ユーザー
+	userRoutes := r.Group("/api/users")
+	{
+		userRoutes.POST("/services", uh.UpdateUserServices) // 新しいエンドポイント
+	}
 
 	return r
 }

@@ -27,9 +27,14 @@ func main() {
 	sampleUserRepository := repository.NewSampleUserRepository(database)
 	sampleUserUsecase := usecase.NewSampleUserUsecase(sampleUserRepository)
 	sampleUserHandler := handler.NewSampleUserHandler(sampleUserUsecase)
+	
+	// 新しいエンティティのDI
+	userRepository := repository.NewUserRepository(database)
+	userUsecase := usecase.NewUserUsecase(userRepository)
+	userHandler := handler.NewUserHandler(userUsecase)
 
 	// ルーター設定
-	r := router.NewRouter(sampleUserHandler)
+	r := router.NewRouter(sampleUserHandler, userHandler)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal("Failed to start server:", err)

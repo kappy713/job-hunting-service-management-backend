@@ -8,7 +8,7 @@ import (
 
 func NewRouter(
 	suh handler.SampleUserHandler,
-	uh handler.UserHandler, // 新しいハンドラーを追加
+	uh handler.UserHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -25,7 +25,8 @@ func NewRouter(
 	// ユーザー
 	userRoutes := r.Group("/api/users")
 	{
-		userRoutes.POST("/services", uh.UpdateUserServices) // 新しいエンドポイント
+		userRoutes.POST("/services", uh.UpdateUserServices)
+		userRoutes.POST("", uh.CreateUser)
 	}
 
 	return r

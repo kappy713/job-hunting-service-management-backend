@@ -12,6 +12,11 @@ import (
 
 func NewRouter(
 	suh handler.SampleUserHandler,
+	sh handler.SupporterzHandler,
+	csh handler.CareerSelectHandler,
+	lrh handler.LevtechRookieHandler,
+	mh handler.MynaviHandler,
+	och handler.OneCareerHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -37,6 +42,26 @@ func NewRouter(
 
 	// サンプルユーザー
 	r.GET("/api/sample-users", suh.GetAllSampleUsers)
+
+	// サポーターズ
+	r.GET("/api/supporterz/:id", sh.GetSupporterzByID)
+	r.POST("/api/supporterz", sh.CreateOrUpdateSupporterz)
+
+	// キャリアセレクト
+	r.GET("/api/career-select/:id", csh.GetCareerSelectByID)
+	r.POST("/api/career-select", csh.CreateOrUpdateCareerSelect)
+
+	// レバテックルーキー
+	r.GET("/api/levtech-rookie/:id", lrh.GetLevtechRookieByID)
+	r.POST("/api/levtech-rookie", lrh.CreateOrUpdateLevtechRookie)
+
+	// マイナビ
+	r.GET("/api/mynavi/:id", mh.GetMynaviByID)
+	r.POST("/api/mynavi", mh.CreateOrUpdateMynavi)
+
+	// ワンキャリア
+	r.GET("/api/one-career/:id", och.GetOneCareerByID)
+	r.POST("/api/one-career", och.CreateOrUpdateOneCareer)
 
 	return r
 }

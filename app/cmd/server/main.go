@@ -58,6 +58,10 @@ func main() {
 	oneCareerUsecase := usecase.NewOneCareerUsecase(oneCareerRepository)
 	oneCareerHandler := handler.NewOneCareerHandler(oneCareerUsecase)
 
+	logRepository := repository.NewLogRepository(database)
+	logUsecase := usecase.NewLogUsecase(logRepository)
+	logHandler := handler.NewLogHandler(logUsecase)
+
 	// ルーター設定
 	r := router.NewRouter(
 		sampleUserHandler,
@@ -67,6 +71,7 @@ func main() {
 		levtechRookieHandler,
 		mynaviHandler,
 		oneCareerHandler,
+		logHandler,
 	)
 
 	if err := r.Run(":8080"); err != nil {

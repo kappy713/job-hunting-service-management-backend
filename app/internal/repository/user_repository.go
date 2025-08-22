@@ -11,6 +11,7 @@ import (
 
 type UserRepository interface {
 	UpdateUserServices(c *gin.Context, userID string, services []string) error
+	UpdateUser(c *gin.Context, user *entity.User) (*entity.User, error)
 }
 
 type userRepository struct {
@@ -34,4 +35,20 @@ func (r *userRepository) UpdateUserServices(c *gin.Context, userID string, servi
 	// ユーザーレコード全体を保存
 	result := r.db.Save(&user)
 	return result.Error
+}
+
+func (r *userRepository) UpdateUser(c *gin.Context, user *entity.User) (*entity.User, error) {
+	// user_idで既存レコードを更新
+	// Gradeが0の場合は除外して更新
+	var result *gorm.DB
+	if user.Grade == 0 {
+		result = r.db.Omit("grade").Save(user)
+	} else {
+		result = r.db.Save(user)
+	}
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return user, nil
 }

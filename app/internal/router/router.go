@@ -45,6 +45,7 @@ func NewRouter(
 	r.GET("/api/sample-users", suh.GetAllSampleUsers)
 
 	// ユーザー
+	r.POST("/api/user", uh.UpdateUser)
 	userRoutes := r.Group("/api/users")
 	{
 		userRoutes.POST("/services", uh.UpdateUserServices) // 新しいエンドポイント

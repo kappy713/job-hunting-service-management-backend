@@ -27,6 +27,7 @@ func Run() error {
 	entities := []interface{}{
 		&entity.SampleUser{},
 		&entity.User{},
+		&entity.Profile{},
 		&entity.Log{},
 		&entity.Supporterz{},
 		&entity.CareerSelect{},

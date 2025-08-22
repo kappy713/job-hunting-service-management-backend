@@ -20,6 +20,26 @@ type Supporterz struct {
 	ResearchDescriptions         pq.StringArray `gorm:"type:text[]" json:"research_descriptions"`
 }
 
+// リクエスト用の構造体
+type SupporterzData struct {
+	CareerVision                 string   `json:"career_vision"`
+	SelfPromotion                string   `json:"self_promotion"`
+	Skills                       []string `json:"skills"`
+	SkillDescriptions            []string `json:"skill_descriptions"`
+	InternExperiences            []string `json:"intern_experiences"`
+	InternExperienceDescriptions []string `json:"intern_experience_descriptions"`
+	Products                     []string `json:"products"`
+	ProductTechStacks            []string `json:"product_tech_stacks"`
+	ProductDescriptions          []string `json:"product_descriptions"`
+	Researches                   []string `json:"researches"`
+	ResearchDescriptions         []string `json:"research_descriptions"`
+}
+
+type CreateSupporterzRequest struct {
+	UserID string         `json:"user_id" binding:"required"`
+	Data   SupporterzData `json:"data" binding:"required"`
+}
+
 func (Supporterz) TableName() string {
 	return "supporterz"
 }

@@ -12,6 +12,7 @@ import (
 
 type LogUsecase interface {
 	GetLogsByUserID(c *gin.Context, userID uuid.UUID) (*entity.LogResponse, error)
+	UpsertLog(c *gin.Context, userID uuid.UUID, targetTable, fieldName string) error
 }
 
 type logUsecase struct {
@@ -39,4 +40,8 @@ func (u *logUsecase) GetLogsByUserID(c *gin.Context, userID uuid.UUID) (*entity.
 	}
 
 	return &response, nil
+}
+
+func (u *logUsecase) UpsertLog(c *gin.Context, userID uuid.UUID, targetTable, fieldName string) error {
+	return u.lr.UpsertLog(c, userID, targetTable, fieldName)
 }

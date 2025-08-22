@@ -16,10 +16,11 @@ type OneCareerUsecase interface {
 
 type oneCareerUsecase struct {
 	ocr repository.OneCareerRepository
+	lu  LogUsecase
 }
 
-func NewOneCareerUsecase(r repository.OneCareerRepository) OneCareerUsecase {
-	return &oneCareerUsecase{ocr: r}
+func NewOneCareerUsecase(r repository.OneCareerRepository, l LogUsecase) OneCareerUsecase {
+	return &oneCareerUsecase{ocr: r, lu: l}
 }
 
 func (u *oneCareerUsecase) GetOneCareerByUserID(c *gin.Context, userID uuid.UUID) (*entity.OneCareer, error) {
@@ -45,5 +46,47 @@ func (u *oneCareerUsecase) CreateOrUpdateOneCareer(c *gin.Context, userID uuid.U
 		EngineerAspiration:           req.EngineerAspiration,
 	}
 
-	return u.ocr.CreateOrUpdateOneCareer(c, oneCareer)
+	result, err := u.ocr.CreateOrUpdateOneCareer(c, oneCareer)
+	if err != nil {
+		return nil, err
+	}
+
+	// 更新されたフィールドのログを記録
+	u.logFieldUpdates(c, userID, req)
+
+	return result, nil
+}
+
+// フィールド更新のログを記録
+func (u *oneCareerUsecase) logFieldUpdates(c *gin.Context, userID uuid.UUID, req entity.OneCareerData) {
+	targetTable := "one_career"
+
+	// 各フィールドが空でなければログを記録
+	if len(req.Skills) > 0 {
+		u.lu.UpsertLog(c, userID, targetTable, "skills")
+	}
+	if len(req.SkillDescriptions) > 0 {
+		u.lu.UpsertLog(c, userID, targetTable, "skill_descriptions")
+	}
+	if len(req.Researches) > 0 {
+		u.lu.UpsertLog(c, userID, targetTable, "researches")
+	}
+	if len(req.ResearchDescriptions) > 0 {
+		u.lu.UpsertLog(c, userID, targetTable, "research_descriptions")
+	}
+	if len(req.InternExperiences) > 0 {
+		u.lu.UpsertLog(c, userID, targetTable, "intern_experiences")
+	}
+	if len(req.InternExperienceDescriptions) > 0 {
+		u.lu.UpsertLog(c, userID, targetTable, "intern_experience_descriptions")
+	}
+	if len(req.Products) > 0 {
+		u.lu.UpsertLog(c, userID, targetTable, "products")
+	}
+	if len(req.ProductDescriptions) > 0 {
+		u.lu.UpsertLog(c, userID, targetTable, "product_descriptions")
+	}
+	if req.EngineerAspiration != "" {
+		u.lu.UpsertLog(c, userID, targetTable, "engineer_aspiration")
+	}
 }

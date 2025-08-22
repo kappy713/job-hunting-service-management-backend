@@ -11,7 +11,7 @@ type Log struct {
 	UserID      uuid.UUID `gorm:"type:uuid" json:"user_id"`
 	TargetTable string    `gorm:"size:100" json:"target_table"`
 	FieldName   string    `gorm:"size:100" json:"field_name"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	UpdatedAt   time.Time `gorm:"type:timestamptz" json:"updated_at"`
 }
 
 func (Log) TableName() string {

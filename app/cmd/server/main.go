@@ -61,7 +61,7 @@ func main() {
 	// ルーター設定
 	r := router.NewRouter(
 		sampleUserHandler,
-		userHandler
+		userHandler,
 		supporterzHandler,
 		careerSelectHandler,
 		levtechRookieHandler,

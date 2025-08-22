@@ -12,7 +12,7 @@ import (
 
 func NewRouter(
 	suh handler.SampleUserHandler,
-	h handler.UserHandler,
+	uh handler.UserHandler,
 	sh handler.SupporterzHandler,
 	csh handler.CareerSelectHandler,
 	lrh handler.LevtechRookieHandler,

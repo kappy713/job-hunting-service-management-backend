@@ -26,12 +26,6 @@ func (r *userRepository) UpdateUserServices(c *gin.Context, userID string, servi
 	if err := r.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
 		return fmt.Errorf("user not found: %w", err)
 	}
-
-	// サービスの更新に加えて、gradeが制約を満たすように値を設定
-	// これにより、データベースのチェック制約違反を防ぐ
-	if user.Grade < 1 || user.Grade > 10 {
-		user.Grade = 1 // 仮に有効な値を設定
-	}
 	
 	// servicesフィールドを更新
 	user.Services = services

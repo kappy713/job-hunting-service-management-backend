@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
@@ -30,12 +31,6 @@ func (r *userRepository) UpdateUserServices(c *gin.Context, userID string, servi
 		return fmt.Errorf("user not found: %w", err)
 	}
 
-	// サービスの更新に加えて、gradeが制約を満たすように値を設定
-	// これにより、データベースのチェック制約違反を防ぐ
-	if user.Grade < 1 || user.Grade > 10 {
-		user.Grade = 1 // 仮に有効な値を設定
-	}
-	
 	// servicesフィールドを更新
 	user.Services = services
 
@@ -45,7 +40,7 @@ func (r *userRepository) UpdateUserServices(c *gin.Context, userID string, servi
 }
 
 func (r *userRepository) CreateUser(c *gin.Context, user *entity.User) error {
-    // GORMのCreateメソッドを使用してユーザーをデータベースに保存
-    result := r.db.WithContext(c).Create(user)
-    return result.Error
+	// GORMのCreateメソッドを使用してユーザーをデータベースに保存
+	result := r.db.WithContext(c).Create(user)
+	return result.Error
 }

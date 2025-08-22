@@ -12,6 +12,7 @@ import (
 
 func NewRouter(
 	suh handler.SampleUserHandler,
+	h handler.UserHandler,
 	sh handler.SupporterzHandler,
 	csh handler.CareerSelectHandler,
 	lrh handler.LevtechRookieHandler,
@@ -42,6 +43,12 @@ func NewRouter(
 
 	// サンプルユーザー
 	r.GET("/api/sample-users", suh.GetAllSampleUsers)
+
+	// ユーザー
+	userRoutes := r.Group("/api/users")
+	{
+		userRoutes.POST("/services", uh.UpdateUserServices) // 新しいエンドポイント
+	}
 
 	// サポーターズ
 	r.GET("/api/supporterz/:id", sh.GetSupporterzByID)

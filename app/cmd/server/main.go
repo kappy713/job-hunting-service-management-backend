@@ -34,6 +34,10 @@ func main() {
 	sampleUserUsecase := usecase.NewSampleUserUsecase(sampleUserRepository)
 	sampleUserHandler := handler.NewSampleUserHandler(sampleUserUsecase)
 
+	userRepository := repository.NewUserRepository(database)
+	userUsecase := usecase.NewUserUsecase(userRepository)
+	userHandler := handler.NewUserHandler(userUsecase)
+
 	supporterzRepository := repository.NewSupporterzRepository(database)
 	supporterzUsecase := usecase.NewSupporterzUsecase(supporterzRepository)
 	supporterzHandler := handler.NewSupporterzHandler(supporterzUsecase)
@@ -57,6 +61,7 @@ func main() {
 	// ルーター設定
 	r := router.NewRouter(
 		sampleUserHandler,
+		userHandler
 		supporterzHandler,
 		careerSelectHandler,
 		levtechRookieHandler,

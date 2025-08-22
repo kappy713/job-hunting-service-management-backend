@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
@@ -26,7 +27,7 @@ func (r *userRepository) UpdateUserServices(c *gin.Context, userID string, servi
 	if err := r.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
 		return fmt.Errorf("user not found: %w", err)
 	}
-	
+
 	// servicesフィールドを更新
 	user.Services = services
 

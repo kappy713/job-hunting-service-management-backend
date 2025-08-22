@@ -33,7 +33,7 @@ func main() {
 	sampleUserRepository := repository.NewSampleUserRepository(database)
 	sampleUserUsecase := usecase.NewSampleUserUsecase(sampleUserRepository)
 	sampleUserHandler := handler.NewSampleUserHandler(sampleUserUsecase)
-	
+
 	// 新しいエンティティのDI
 	userRepository := repository.NewUserRepository(database)
 	userUsecase := usecase.NewUserUsecase(userRepository)

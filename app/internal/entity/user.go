@@ -26,3 +26,22 @@ type User struct {
 func (User) TableName() string {
 	return "users"
 }
+
+// リクエスト用の構造体
+type UserData struct {
+	LastName      string     `json:"last_name"`
+	FirstName     string     `json:"first_name"`
+	BirthDate     *time.Time `json:"birth_date,omitempty"`
+	Age           int        `json:"age" binding:"min=0,max=150"`
+	University    string     `json:"university"`
+	Category      string     `json:"category"`
+	Faculty       string     `json:"faculty"`
+	Grade         *int       `json:"grade,omitempty" binding:"omitempty,min=1,max=10"`
+	TargetJobType string     `json:"target_job_type"`
+	Services      []string   `json:"services"`
+}
+
+type UpdateUserRequest struct {
+	UserID string   `json:"user_id" binding:"required"`
+	Data   UserData `json:"data" binding:"required"`
+}

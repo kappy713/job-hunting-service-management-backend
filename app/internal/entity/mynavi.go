@@ -8,6 +8,17 @@ type Mynavi struct {
 	FuturePlan    string    `gorm:"size:300" json:"future_plan"`
 }
 
+// リクエスト用の構造体
+type MynaviData struct {
+	SelfPromotion string `json:"self_promotion"`
+	FuturePlan    string `json:"future_plan"`
+}
+
+type CreateMynaviRequest struct {
+	UserID string     `json:"user_id" binding:"required"`
+	Data   MynaviData `json:"data" binding:"required"`
+}
+
 func (Mynavi) TableName() string {
 	return "mynavi"
 }

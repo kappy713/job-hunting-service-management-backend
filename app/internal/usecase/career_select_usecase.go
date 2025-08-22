@@ -32,9 +32,8 @@ func (u *careerSelectUsecase) GetCareerSelectByUserID(c *gin.Context, userID uui
 }
 
 func (u *careerSelectUsecase) CreateOrUpdateCareerSelect(c *gin.Context, userID uuid.UUID, req entity.CareerSelectData) (*entity.CareerSelect, error) {
-	// リクエストから entity に変換
 	careerSelect := &entity.CareerSelect{
-		ID:                                   userID, // IDにuser_idを設定
+		ID:                                   userID,
 		Skills:                               pq.StringArray(req.Skills),
 		SkillDescriptions:                    pq.StringArray(req.SkillDescriptions),
 		CompanySelectionCriteria:             pq.StringArray(req.CompanySelectionCriteria),

@@ -32,9 +32,8 @@ func (u *oneCareerUsecase) GetOneCareerByUserID(c *gin.Context, userID uuid.UUID
 }
 
 func (u *oneCareerUsecase) CreateOrUpdateOneCareer(c *gin.Context, userID uuid.UUID, req entity.OneCareerData) (*entity.OneCareer, error) {
-	// リクエストから entity に変換
 	oneCareer := &entity.OneCareer{
-		ID:                           userID, // IDにuser_idを設定
+		ID:                           userID,
 		Skills:                       pq.StringArray(req.Skills),
 		SkillDescriptions:            pq.StringArray(req.SkillDescriptions),
 		Researches:                   pq.StringArray(req.Researches),

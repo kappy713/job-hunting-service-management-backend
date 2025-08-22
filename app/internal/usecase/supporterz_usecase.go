@@ -32,9 +32,8 @@ func (u *supporterzUsecase) GetSupporterzByUserID(c *gin.Context, userID uuid.UU
 }
 
 func (u *supporterzUsecase) CreateOrUpdateSupporterz(c *gin.Context, userID uuid.UUID, req entity.SupporterzData) (*entity.Supporterz, error) {
-	// リクエストから entity に変換
 	supporterz := &entity.Supporterz{
-		ID:                           userID, // IDにuser_idを設定
+		ID:                           userID,
 		CareerVision:                 req.CareerVision,
 		SelfPromotion:                req.SelfPromotion,
 		Skills:                       pq.StringArray(req.Skills),

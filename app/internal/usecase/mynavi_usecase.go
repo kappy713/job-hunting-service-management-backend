@@ -31,9 +31,8 @@ func (u *mynaviUsecase) GetMynaviByUserID(c *gin.Context, userID uuid.UUID) (*en
 }
 
 func (u *mynaviUsecase) CreateOrUpdateMynavi(c *gin.Context, userID uuid.UUID, req entity.MynaviData) (*entity.Mynavi, error) {
-	// リクエストから entity に変換
 	mynavi := &entity.Mynavi{
-		ID:            userID, // IDにuser_idを設定
+		ID:            userID,
 		SelfPromotion: req.SelfPromotion,
 		FuturePlan:    req.FuturePlan,
 	}

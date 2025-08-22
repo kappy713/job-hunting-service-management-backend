@@ -32,9 +32,8 @@ func (u *levtechRookieUsecase) GetLevtechRookieByUserID(c *gin.Context, userID u
 }
 
 func (u *levtechRookieUsecase) CreateOrUpdateLevtechRookie(c *gin.Context, userID uuid.UUID, req entity.LevtechRookieData) (*entity.LevtechRookie, error) {
-	// リクエストから entity に変換
 	levtechRookie := &entity.LevtechRookie{
-		ID:                              userID, // IDにuser_idを設定
+		ID:                              userID,
 		DesiredJobType:                  pq.StringArray(req.DesiredJobType),
 		CareerAspiration:                pq.StringArray(req.CareerAspiration),
 		InterestedTasks:                 pq.StringArray(req.InterestedTasks),

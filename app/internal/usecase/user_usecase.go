@@ -16,16 +16,53 @@ type UserUsecase interface {
 }
 
 type userUsecase struct {
-	ur repository.UserRepository
+	ur        repository.UserRepository
+	aiUsecase AIGenerationUsecase
 }
 
-func NewUserUsecase(r repository.UserRepository) UserUsecase {
-	return &userUsecase{ur: r}
+func NewUserUsecase(r repository.UserRepository, aiUsecase AIGenerationUsecase) UserUsecase {
+	return &userUsecase{
+		ur:        r,
+		aiUsecase: aiUsecase,
+	}
 }
 
 func (u *userUsecase) UpdateUserServices(c *gin.Context, userID string, services []string) error {
-	// ここでバリデーションやビジネスロジックを追加
-	return u.ur.UpdateUserServices(c, userID, services)
+	// サービス情報を更新
+	if err := u.ur.UpdateUserServices(c, userID, services); err != nil {
+		return err
+	}
+
+	// サービスが設定されている場合、AI生成を実行
+	if len(services) > 0 {
+		// UUIDに変換
+		userUUID, err := uuid.Parse(userID)
+		if err != nil {
+			// UUID変換エラーの場合はログに記録するが、処理は継続
+			// TODO: ログ出力を追加
+			return nil
+		}
+
+		// 日本語サービス名を英語名に変換
+		convertedServices := make([]string, 0, len(services))
+		for _, service := range services {
+			if englishName, exists := entity.ConvertServiceName(service); exists {
+				convertedServices = append(convertedServices, englishName)
+			}
+			// 変換できないサービス名はスキップ
+		}
+
+		// 変換されたサービスがある場合のみAI生成を実行
+		if len(convertedServices) > 0 {
+			// AI生成を実行（エラーが発生してもサービス更新は成功とする）
+			if _, err := u.aiUsecase.GenerateServiceProfiles(c, userUUID, convertedServices); err != nil {
+				// AI生成エラーはログに記録するが、処理は継続
+				// TODO: ログ出力を追加
+			}
+		}
+	}
+
+	return nil
 }
 
 func (u *userUsecase) CreateUser(c *gin.Context, userID uuid.UUID, req entity.CreateUserData) (*entity.User, error) {

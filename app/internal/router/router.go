@@ -20,6 +20,7 @@ func NewRouter(
 	och handler.OneCareerHandler,
 	lh handler.LogHandler,
 	aih handler.AIGenerationHandler,
+	ph handler.ProfileHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -79,6 +80,13 @@ func NewRouter(
 
 	// AI生成
 	r.POST("/api/ai/generate-profiles", aih.GenerateServiceProfiles)
+
+	// --- プロフィール（ES） ---
+	profileRoutes := r.Group("/api/profile")
+	{
+		profileRoutes.GET("/:id", ph.GetProfileByUserID)
+		profileRoutes.POST("", ph.CreateOrUpdateProfile)
+	}
 
 	return r
 }

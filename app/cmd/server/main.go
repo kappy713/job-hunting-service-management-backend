@@ -74,6 +74,11 @@ func main() {
 	aiGenerationUsecase := usecase.NewAIGenerationUsecase(aiGenerationRepository, geminiClient)
 	aiGenerationHandler := handler.NewAIGenerationHandler(aiGenerationUsecase)
 
+	// ES API関連のDI ---
+	profileRepository := repository.NewProfileRepository(database)
+	profileUsecase := usecase.NewProfileUsecase(profileRepository, logUsecase)
+	profileHandler := handler.NewProfileHandler(profileUsecase)
+
 	// ルーター設定
 	r := router.NewRouter(
 		sampleUserHandler,
@@ -85,6 +90,7 @@ func main() {
 		oneCareerHandler,
 		logHandler,
 		aiGenerationHandler,
+		profileHandler,
 	)
 
 	if err := r.Run(":8080"); err != nil {

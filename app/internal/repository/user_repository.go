@@ -58,7 +58,7 @@ func (r *userRepository) UpdateUser(c *gin.Context, userID string, updateData ma
 		}
 		return nil, result.Error
 	}
-	
+
 	// 更新日時を追加
 	updateData["updated_at"] = time.Now()
 
@@ -66,12 +66,12 @@ func (r *userRepository) UpdateUser(c *gin.Context, userID string, updateData ma
 	if err := r.db.Model(&existingUser).Updates(updateData).Error; err != nil {
 		return nil, err
 	}
-	
+
 	// 更新されたレコードを再度取得して返す
 	var updatedUser entity.User
 	if err := r.db.Where("user_id = ?", userID).First(&updatedUser).Error; err != nil {
 		return nil, err
 	}
-	
+
 	return &updatedUser, nil
 }

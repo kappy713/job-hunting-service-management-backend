@@ -8,6 +8,7 @@ import (
 
 func NewRouter(
 	suh handler.SampleUserHandler,
+	uh handler.UserHandler, // 新しいハンドラーを追加
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -20,6 +21,9 @@ func NewRouter(
 
 	// サンプルユーザー
 	r.GET("/api/sample-users", suh.GetAllSampleUsers)
+
+	// 新しいエンドポイント
+	r.GET("/api/users/:userID", uh.GetUserByID)
 
 	return r
 }

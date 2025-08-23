@@ -51,6 +51,7 @@ func main() {
 	aiGenerationHandler := handler.NewAIGenerationHandler(aiGenerationUsecase)
 
 	// UserUsecaseにAI生成機能を依存として渡す
+	userRepository := repository.NewUserRepository(database)
 	userUsecase := usecase.NewUserUsecase(userRepository, aiGenerationUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
 

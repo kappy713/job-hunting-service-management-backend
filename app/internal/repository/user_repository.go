@@ -11,6 +11,7 @@ import (
 )
 
 type UserRepository interface {
+	GetUserByID(c *gin.Context, userID string) (*entity.User, error)
 	//ユーザーIDとサービスリストを基に既存ユーザーの情報を更新
 	UpdateUserServices(c *gin.Context, userID string, services []string) error
 	//新しいユーザー情報をデータベースに保存
@@ -74,4 +75,13 @@ func (r *userRepository) UpdateUser(c *gin.Context, userID string, updateData ma
 	}
 
 	return &updatedUser, nil
+}
+
+func (r *userRepository) GetUserByID(c *gin.Context, userID string) (*entity.User, error) {
+	var user entity.User
+	result := r.db.First(&user, "user_id = ?", userID)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
 }

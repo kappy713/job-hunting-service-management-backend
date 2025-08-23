@@ -1,18 +1,20 @@
 package handler
 
 import (
-	"job-hunting-service-management-backend/app/internal/entity" // entityパッケージをインポート
-	"job-hunting-service-management-backend/app/internal/usecase"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid" // uuidを扱うためにインポート
+	"github.com/google/uuid"
+
+	"job-hunting-service-management-backend/app/internal/entity"
+	"job-hunting-service-management-backend/app/internal/usecase"
 )
 
 type UserHandler interface {
 	UpdateUserServices(c *gin.Context)
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
+	GetUserByID(c *gin.Context)
 }
 
 type userHandler struct {
@@ -88,5 +90,15 @@ func (h *userHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *userHandler) GetUserByID(c *gin.Context) {
+	userID := c.Param("userID")
+	user, err := h.uu.GetUserByID(c, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, user)
 }

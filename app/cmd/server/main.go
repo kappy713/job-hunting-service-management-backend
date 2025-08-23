@@ -40,8 +40,6 @@ func main() {
 	sampleUserUsecase := usecase.NewSampleUserUsecase(sampleUserRepository)
 	sampleUserHandler := handler.NewSampleUserHandler(sampleUserUsecase)
 
-	userRepository := repository.NewUserRepository(database)
-
 	logRepository := repository.NewLogRepository(database)
 	logUsecase := usecase.NewLogUsecase(logRepository)
 	logHandler := handler.NewLogHandler(logUsecase)
@@ -53,6 +51,7 @@ func main() {
 	aiGenerationHandler := handler.NewAIGenerationHandler(aiGenerationUsecase)
 
 	// UserUsecaseにAI生成機能を依存として渡す
+	userRepository := repository.NewUserRepository(database)
 	userUsecase := usecase.NewUserUsecase(userRepository, aiGenerationUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
 

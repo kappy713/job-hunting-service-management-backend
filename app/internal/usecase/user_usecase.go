@@ -15,6 +15,7 @@ type UserUsecase interface {
 	UpdateUserServices(c *gin.Context, userID string, services []string) error
 	CreateUser(c *gin.Context, userID uuid.UUID, req entity.CreateUserData) (*entity.User, error)
 	UpdateUser(c *gin.Context, userID uuid.UUID, req entity.UserData) (*entity.User, error)
+	GetUserByID(c *gin.Context, userID string) (*entity.User, error)
 }
 
 type userUsecase struct {
@@ -127,4 +128,15 @@ func (u *userUsecase) UpdateUser(c *gin.Context, userID uuid.UUID, req entity.Us
 
 	// リポジトリに更新用データマップを渡す
 	return u.ur.UpdateUser(c, userID.String(), updateData)
+}
+
+func (u *userUsecase) GetUserByID(c *gin.Context, userID string) (*entity.User, error) {
+	user, err := u.ur.GetUserByID(c, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// ここでビジネスロジックを追加（例：データ変換、追加のチェックなど）
+
+	return user, nil
 }

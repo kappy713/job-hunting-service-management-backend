@@ -64,9 +64,41 @@ func NewGeminiClient() *GeminiClient {
 		APIKey:  apiKey,
 		BaseURL: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
 		Client: &http.Client{
-			Timeout: 30 * time.Second,
+			Timeout: 120 * time.Second, // 2分に延長
 		},
 	}
+}
+
+// リトライ機能付きHTTPリクエスト送信
+func (g *GeminiClient) sendRequestWithRetry(ctx context.Context, req *http.Request, maxRetries int) (*http.Response, error) {
+	var lastErr error
+
+	for attempt := 0; attempt <= maxRetries; attempt++ {
+		if attempt > 0 {
+			// リトライ前に少し待機（指数バックオフ）
+			waitTime := time.Duration(attempt) * 10 * time.Second
+			select {
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			case <-time.After(waitTime):
+			}
+		}
+
+		resp, err := g.Client.Do(req)
+		if err == nil {
+			return resp, nil
+		}
+
+		lastErr = err
+		// タイムアウトエラーの場合はリトライ
+		if strings.Contains(err.Error(), "timeout") || strings.Contains(err.Error(), "deadline exceeded") {
+			continue
+		}
+		// その他のエラーの場合は即座に終了
+		return nil, err
+	}
+
+	return nil, fmt.Errorf("failed after %d retries: %w", maxRetries, lastErr)
 }
 
 // プロンプトテンプレートを処理してユーザー情報を埋め込む
@@ -116,7 +148,8 @@ func (g *GeminiClient) GenerateContent(ctx context.Context, prompt string) (stri
 
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := g.Client.Do(req)
+	// リトライ機能付きでリクエスト送信（最大2回リトライ）
+	resp, err := g.sendRequestWithRetry(ctx, req, 2)
 	if err != nil {
 		return "", fmt.Errorf("failed to send request: %w", err)
 	}

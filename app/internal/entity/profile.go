@@ -28,3 +28,28 @@ type Profile struct {
 func (Profile) TableName() string {
 	return "profiles"
 }
+
+// リクエスト用の構造体
+type ProfileData struct {
+	CareerVision              string   `json:"career_vision"`
+	SelfPromotion             string   `json:"self_promotion"`
+	StudentExperience         string   `json:"student_experience"`
+	Research                  string   `json:"research"`
+	Products                  []string `json:"products"`
+	ProductDescriptions       []string `json:"product_descriptions"`
+	Skills                    []string `json:"skills"`
+	SkillDescriptions         []string `json:"skill_descriptions"`
+	Interns                   []string `json:"interns"`
+	InternDescriptions        []string `json:"intern_descriptions"`
+	Organization              string   `json:"organization"`
+	Certifications            []string `json:"certifications"`
+	CertificationDescriptions []string `json:"certification_descriptions"`
+	DesiredJobType            string   `json:"desired_job_type"`
+	CompanySelectionCriteria  string   `json:"company_selection_criteria"`
+	EngineerAspiration        string   `json:"engineer_aspiration"`
+}
+
+type CreateProfileRequest struct {
+	UserID string      `json:"user_id" binding:"required"`
+	Data   ProfileData `json:"data" binding:"required"`
+}

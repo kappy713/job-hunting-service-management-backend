@@ -11,7 +11,7 @@ import (
 
 type UserUsecase interface {
 	UpdateUserServices(c *gin.Context, userID string, services []string) error
-	CreateUser(c *gin.Context, user *entity.User) error
+	CreateUser(c *gin.Context, userID uuid.UUID, req entity.CreateUserData) (*entity.User, error)
 	UpdateUser(c *gin.Context, userID uuid.UUID, req entity.UserData) (*entity.User, error)
 }
 
@@ -28,8 +28,26 @@ func (u *userUsecase) UpdateUserServices(c *gin.Context, userID string, services
 	return u.ur.UpdateUserServices(c, userID, services)
 }
 
-func (u *userUsecase) CreateUser(c *gin.Context, user *entity.User) error {
-	return u.ur.CreateUser(c, user)
+func (u *userUsecase) CreateUser(c *gin.Context, userID uuid.UUID, req entity.CreateUserData) (*entity.User, error) {
+	// 全ての項目が入ってくる想定なので、直接マップに設定
+	updateData := map[string]interface{}{
+		"last_name":       req.LastName,
+		"first_name":      req.FirstName,
+		"age":             req.Age,
+		"university":      req.University,
+		"category":        req.Category,
+		"faculty":         req.Faculty,
+		"grade":           req.Grade,
+		"target_job_type": req.TargetJobType,
+	}
+
+	// birth_dateは nilの可能性があるので条件付きで追加
+	if req.BirthDate != nil {
+		updateData["birth_date"] = req.BirthDate
+	}
+
+	// リポジトリに更新用データマップを渡す
+	return u.ur.UpdateUser(c, userID.String(), updateData)
 }
 
 func (u *userUsecase) UpdateUser(c *gin.Context, userID uuid.UUID, req entity.UserData) (*entity.User, error) {

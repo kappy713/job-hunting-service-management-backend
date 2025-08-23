@@ -47,14 +47,12 @@ func (u *profileUsecase) CreateOrUpdateProfile(c *gin.Context, userID uuid.UUID,
 	// 既存のプロフィールを取得（存在しない場合は新規作成）
 	existingProfile, err := u.pr.GetProfileByUserID(c, userID)
 	if err != nil {
-		// プロフィールが存在しない場合は新規作成として処理
-		existingProfile = &entity.Profile{
-			ID: userID,
-		}
+		// プロフィールが存在しない場合はnilとして処理
+		existingProfile = nil
 	}
 
 	// 部分更新ロジック：空でないフィールドのみを更新
-	profile := u.mergeProfileData(existingProfile, req)
+	profile := u.mergeProfileData(existingProfile, req, userID)
 
 	// プロフィールを保存
 	result, err := u.pr.CreateOrUpdateProfile(c, profile)
@@ -104,26 +102,35 @@ func validateProfileData(req entity.ProfileData) error {
 
 // mergeProfileData は既存のプロフィールデータと新しいリクエストデータをマージします。
 // 空でないフィールドのみを更新し、空のフィールドは既存の値を保持します。
-func (u *profileUsecase) mergeProfileData(existing *entity.Profile, req entity.ProfileData) *entity.Profile {
-	// 既存のプロフィールをベースにコピー
-	result := &entity.Profile{
-		ID:                        existing.ID,
-		CareerVision:              existing.CareerVision,
-		SelfPromotion:             existing.SelfPromotion,
-		StudentExperience:         existing.StudentExperience,
-		Research:                  existing.Research,
-		Products:                  existing.Products,
-		ProductDescriptions:       existing.ProductDescriptions,
-		Skills:                    existing.Skills,
-		SkillDescriptions:         existing.SkillDescriptions,
-		Interns:                   existing.Interns,
-		InternDescriptions:        existing.InternDescriptions,
-		Organization:              existing.Organization,
-		Certifications:            existing.Certifications,
-		CertificationDescriptions: existing.CertificationDescriptions,
-		DesiredJobType:            existing.DesiredJobType,
-		CompanySelectionCriteria:  existing.CompanySelectionCriteria,
-		EngineerAspiration:        existing.EngineerAspiration,
+func (u *profileUsecase) mergeProfileData(existing *entity.Profile, req entity.ProfileData, userID uuid.UUID) *entity.Profile {
+	var result *entity.Profile
+
+	if existing == nil {
+		// 新規作成の場合はuserIDを使用
+		result = &entity.Profile{
+			ID: userID, // userIDをプロフィールのIDとして使用
+		}
+	} else {
+		// 既存のプロフィールをベースにコピー
+		result = &entity.Profile{
+			ID:                        existing.ID,
+			CareerVision:              existing.CareerVision,
+			SelfPromotion:             existing.SelfPromotion,
+			StudentExperience:         existing.StudentExperience,
+			Research:                  existing.Research,
+			Products:                  existing.Products,
+			ProductDescriptions:       existing.ProductDescriptions,
+			Skills:                    existing.Skills,
+			SkillDescriptions:         existing.SkillDescriptions,
+			Interns:                   existing.Interns,
+			InternDescriptions:        existing.InternDescriptions,
+			Organization:              existing.Organization,
+			Certifications:            existing.Certifications,
+			CertificationDescriptions: existing.CertificationDescriptions,
+			DesiredJobType:            existing.DesiredJobType,
+			CompanySelectionCriteria:  existing.CompanySelectionCriteria,
+			EngineerAspiration:        existing.EngineerAspiration,
+		}
 	}
 
 	// 文字列フィールドの部分更新

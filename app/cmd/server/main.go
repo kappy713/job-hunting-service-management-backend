@@ -41,12 +41,20 @@ func main() {
 	sampleUserHandler := handler.NewSampleUserHandler(sampleUserUsecase)
 
 	userRepository := repository.NewUserRepository(database)
-	userUsecase := usecase.NewUserUsecase(userRepository)
-	userHandler := handler.NewUserHandler(userUsecase)
 
 	logRepository := repository.NewLogRepository(database)
 	logUsecase := usecase.NewLogUsecase(logRepository)
 	logHandler := handler.NewLogHandler(logUsecase)
+
+	// AI生成機能（userUsecaseより先に初期化）
+	geminiClient := client.NewGeminiClient()
+	aiGenerationRepository := repository.NewAIGenerationRepository(database)
+	aiGenerationUsecase := usecase.NewAIGenerationUsecase(aiGenerationRepository, geminiClient)
+	aiGenerationHandler := handler.NewAIGenerationHandler(aiGenerationUsecase)
+
+	// UserUsecaseにAI生成機能を依存として渡す
+	userUsecase := usecase.NewUserUsecase(userRepository, aiGenerationUsecase)
+	userHandler := handler.NewUserHandler(userUsecase)
 
 	supporterzRepository := repository.NewSupporterzRepository(database)
 	supporterzUsecase := usecase.NewSupporterzUsecase(supporterzRepository, logUsecase)
@@ -67,12 +75,6 @@ func main() {
 	oneCareerRepository := repository.NewOneCareerRepository(database)
 	oneCareerUsecase := usecase.NewOneCareerUsecase(oneCareerRepository, logUsecase)
 	oneCareerHandler := handler.NewOneCareerHandler(oneCareerUsecase)
-
-	// AI生成機能
-	geminiClient := client.NewGeminiClient()
-	aiGenerationRepository := repository.NewAIGenerationRepository(database)
-	aiGenerationUsecase := usecase.NewAIGenerationUsecase(aiGenerationRepository, geminiClient)
-	aiGenerationHandler := handler.NewAIGenerationHandler(aiGenerationUsecase)
 
 	// ルーター設定
 	r := router.NewRouter(

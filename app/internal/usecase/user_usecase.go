@@ -1,8 +1,6 @@
 package usecase
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -35,26 +33,41 @@ func (u *userUsecase) CreateUser(c *gin.Context, user *entity.User) error {
 }
 
 func (u *userUsecase) UpdateUser(c *gin.Context, userID uuid.UUID, req entity.UserData) (*entity.User, error) {
-	// リクエストから entity に変換
-	now := time.Now()
-	user := &entity.User{
-		UserID:        userID,
-		LastName:      req.LastName,
-		FirstName:     req.FirstName,
-		BirthDate:     req.BirthDate,
-		Age:           req.Age,
-		University:    req.University,
-		Category:      req.Category,
-		Faculty:       req.Faculty,
-		TargetJobType: req.TargetJobType,
-		Services:      pq.StringArray(req.Services),
-		UpdatedAt:     now,
-	}
+	// 更新するフィールドをマップに格納
+	updateData := make(map[string]interface{})
 
-	// Gradeが指定されている場合のみ設定
+	if req.LastName != "" {
+		updateData["last_name"] = req.LastName
+	}
+	if req.FirstName != "" {
+		updateData["first_name"] = req.FirstName
+	}
+	if req.BirthDate != nil {
+		updateData["birth_date"] = req.BirthDate
+	}
+	if req.Age != 0 {
+		updateData["age"] = req.Age
+	}
+	if req.University != "" {
+		updateData["university"] = req.University
+	}
+	if req.Category != "" {
+		updateData["category"] = req.Category
+	}
+	if req.Faculty != "" {
+		updateData["faculty"] = req.Faculty
+	}
+	if req.TargetJobType != "" {
+		updateData["target_job_type"] = req.TargetJobType
+	}
+	if req.Services != nil {
+		updateData["services"] = pq.StringArray(req.Services)
+	}
+	// Gradeが指定されている場合のみ更新対象に追加
 	if req.Grade != nil {
-		user.Grade = *req.Grade
+		updateData["grade"] = *req.Grade
 	}
 
-	return u.ur.UpdateUser(c, user)
+	// リポジトリに更新用データマップを渡す
+	return u.ur.UpdateUser(c, userID.String(), updateData)
 }

@@ -7,20 +7,21 @@ import (
 	"github.com/lib/pq"
 )
 
+// User ユーザー情報
 type User struct {
-	UserID        uuid.UUID      `gorm:"type:uuid;primarykey" json:"user_id"`
-	LastName      string         `gorm:"not null;size:50" json:"last_name"`
-	FirstName     string         `gorm:"not null;size:50" json:"first_name"`
-	BirthDate     *time.Time     `gorm:"type:date" json:"birth_date,omitempty"`
-	Age           int            `gorm:"check:age >= 0 AND age <= 150" json:"age"`
-	University    string         `gorm:"size:50" json:"university"`
-	Category      string         `gorm:"size:100" json:"category"`
-	Faculty       string         `gorm:"size:50" json:"faculty"`
-	Grade         int            `gorm:"check:grade >= 1 AND grade <= 10" json:"grade"`
-	TargetJobType string         `gorm:"not null;size:50" json:"target_job_type"`
-	Services      pq.StringArray `gorm:"type:text[]" json:"services"`
-	CreatedAt     time.Time      `json:"created_at"`
-	UpdatedAt     time.Time      `json:"updated_at"`
+	UserID        uuid.UUID      `gorm:"type:uuid;primarykey" json:"user_id"`           // ユーザーID（主キー）
+	LastName      string         `gorm:"not null;size:50" json:"last_name"`             // 姓
+	FirstName     string         `gorm:"not null;size:50" json:"first_name"`            // 名
+	BirthDate     *time.Time     `gorm:"type:date" json:"birth_date,omitempty"`         // 生年月日
+	Age           int            `gorm:"check:age >= 0 AND age <= 150" json:"age"`      // 年齢
+	University    string         `gorm:"size:50" json:"university"`                     // 大学名
+	Category      string         `gorm:"size:100" json:"category"`                      // カテゴリ（学部系統など）
+	Faculty       string         `gorm:"size:50" json:"faculty"`                        // 学部名
+	Grade         int            `gorm:"check:grade >= 1 AND grade <= 10" json:"grade"` // 学年
+	TargetJobType string         `gorm:"not null;size:50" json:"target_job_type"`       // 志望職種
+	Services      pq.StringArray `gorm:"type:text[]" json:"services"`                   // 利用する就活サービス一覧
+	CreatedAt     time.Time      `json:"created_at"`                                    // 作成日時
+	UpdatedAt     time.Time      `json:"updated_at"`                                    // 更新日時
 }
 
 func (User) TableName() string {

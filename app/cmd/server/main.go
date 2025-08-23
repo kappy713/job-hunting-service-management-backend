@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"job-hunting-service-management-backend/app/infrastructure/client"
 	"job-hunting-service-management-backend/app/infrastructure/db"
 	"job-hunting-service-management-backend/app/internal/handler"
 	"job-hunting-service-management-backend/app/internal/repository"
@@ -67,6 +68,12 @@ func main() {
 	oneCareerUsecase := usecase.NewOneCareerUsecase(oneCareerRepository, logUsecase)
 	oneCareerHandler := handler.NewOneCareerHandler(oneCareerUsecase)
 
+	// AI生成機能
+	geminiClient := client.NewGeminiClient()
+	aiGenerationRepository := repository.NewAIGenerationRepository(database)
+	aiGenerationUsecase := usecase.NewAIGenerationUsecase(aiGenerationRepository, geminiClient)
+	aiGenerationHandler := handler.NewAIGenerationHandler(aiGenerationUsecase)
+
 	// ルーター設定
 	r := router.NewRouter(
 		sampleUserHandler,
@@ -77,6 +84,7 @@ func main() {
 		mynaviHandler,
 		oneCareerHandler,
 		logHandler,
+		aiGenerationHandler,
 	)
 
 	if err := r.Run(":8080"); err != nil {

@@ -19,6 +19,7 @@ func NewRouter(
 	mh handler.MynaviHandler,
 	och handler.OneCareerHandler,
 	lh handler.LogHandler,
+	aih handler.AIGenerationHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -75,6 +76,9 @@ func NewRouter(
 
 	// ログ
 	r.GET("/api/log/:id", lh.GetLogsByUserID)
+
+	// AI生成
+	r.POST("/api/ai/generate-profiles", aih.GenerateServiceProfiles)
 
 	return r
 }

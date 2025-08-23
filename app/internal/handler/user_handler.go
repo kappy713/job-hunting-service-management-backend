@@ -1,16 +1,18 @@
 package handler
 
 import (
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"job-hunting-service-management-backend/app/internal/usecase"
 	"job-hunting-service-management-backend/app/internal/entity" // entityパッケージをインポート
+	"job-hunting-service-management-backend/app/internal/usecase"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid" // uuidを扱うためにインポート
 )
 
 type UserHandler interface {
 	UpdateUserServices(c *gin.Context)
 	CreateUser(c *gin.Context)
+	UpdateUser(c *gin.Context)
 }
 
 type userHandler struct {
@@ -23,15 +25,15 @@ func NewUserHandler(u usecase.UserUsecase) UserHandler {
 
 // 新しいユーザー作成のリクエストボディを定義
 type createRequest struct {
-	UserID    string   `json:"user_id" binding:"required"`
-	LastName  string   `json:"last_name" binding:"required"`
-	FirstName string   `json:"first_name" binding:"required"`
-	BirthDate string   `json:"birth_date"`
-	Age       int      `json:"age" binding:"required"`
-	University string  `json:"university"`
-	Category string    `json:"category"`
-	Faculty string     `json:"faculty"`
-	Grade int          `json:"grade"`
+	UserID        string `json:"user_id" binding:"required"`
+	LastName      string `json:"last_name" binding:"required"`
+	FirstName     string `json:"first_name" binding:"required"`
+	BirthDate     string `json:"birth_date"`
+	Age           int    `json:"age" binding:"required"`
+	University    string `json:"university"`
+	Category      string `json:"category"`
+	Faculty       string `json:"faculty"`
+	Grade         int    `json:"grade"`
 	TargetJobType string `json:"target_job_type" binding:"required"`
 }
 
@@ -64,14 +66,14 @@ func (h *userHandler) CreateUser(c *gin.Context) {
 
 	// リクエストデータをエンティティにマッピング
 	user := &entity.User{
-		UserID: uuid.MustParse(req.UserID),
-		LastName: req.LastName,
-		FirstName: req.FirstName,
-		Age: req.Age,
-		University: req.University,
-		Category: req.Category,
-		Faculty: req.Faculty,
-		Grade: req.Grade,
+		UserID:        uuid.MustParse(req.UserID),
+		LastName:      req.LastName,
+		FirstName:     req.FirstName,
+		Age:           req.Age,
+		University:    req.University,
+		Category:      req.Category,
+		Faculty:       req.Faculty,
+		Grade:         req.Grade,
 		TargetJobType: req.TargetJobType,
 	}
 
@@ -80,4 +82,28 @@ func (h *userHandler) CreateUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
+}
+
+func (h *userHandler) UpdateUser(c *gin.Context) {
+	var req entity.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// UUIDのパース
+	userID, err := uuid.Parse(req.UserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	// Usecaseに渡すのはdataの部分のみ
+	user, err := h.uu.UpdateUser(c, userID, req.Data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

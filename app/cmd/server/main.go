@@ -2,15 +2,26 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"job-hunting-service-management-backend/app/infrastructure/db"
 	"job-hunting-service-management-backend/app/internal/handler"
 	"job-hunting-service-management-backend/app/internal/repository"
 	"job-hunting-service-management-backend/app/internal/router"
 	"job-hunting-service-management-backend/app/internal/usecase"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// 日本時間をデフォルトに設定
+	jst := time.FixedZone("Asia/Tokyo", 9*60*60)
+	time.Local = jst
+
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found or failed to load .env file:", err)
+	}
+
 	// DB接続
 	database, err := db.NewDB()
 	if err != nil {
@@ -28,13 +39,45 @@ func main() {
 	sampleUserUsecase := usecase.NewSampleUserUsecase(sampleUserRepository)
 	sampleUserHandler := handler.NewSampleUserHandler(sampleUserUsecase)
 
-	// 新しいエンティティのDI
 	userRepository := repository.NewUserRepository(database)
 	userUsecase := usecase.NewUserUsecase(userRepository)
 	userHandler := handler.NewUserHandler(userUsecase)
 
+	logRepository := repository.NewLogRepository(database)
+	logUsecase := usecase.NewLogUsecase(logRepository)
+	logHandler := handler.NewLogHandler(logUsecase)
+
+	supporterzRepository := repository.NewSupporterzRepository(database)
+	supporterzUsecase := usecase.NewSupporterzUsecase(supporterzRepository, logUsecase)
+	supporterzHandler := handler.NewSupporterzHandler(supporterzUsecase)
+
+	careerSelectRepository := repository.NewCareerSelectRepository(database)
+	careerSelectUsecase := usecase.NewCareerSelectUsecase(careerSelectRepository, logUsecase)
+	careerSelectHandler := handler.NewCareerSelectHandler(careerSelectUsecase)
+
+	levtechRookieRepository := repository.NewLevtechRookieRepository(database)
+	levtechRookieUsecase := usecase.NewLevtechRookieUsecase(levtechRookieRepository, logUsecase)
+	levtechRookieHandler := handler.NewLevtechRookieHandler(levtechRookieUsecase)
+
+	mynaviRepository := repository.NewMynaviRepository(database)
+	mynaviUsecase := usecase.NewMynaviUsecase(mynaviRepository, logUsecase)
+	mynaviHandler := handler.NewMynaviHandler(mynaviUsecase)
+
+	oneCareerRepository := repository.NewOneCareerRepository(database)
+	oneCareerUsecase := usecase.NewOneCareerUsecase(oneCareerRepository, logUsecase)
+	oneCareerHandler := handler.NewOneCareerHandler(oneCareerUsecase)
+
 	// ルーター設定
-	r := router.NewRouter(sampleUserHandler, userHandler)
+	r := router.NewRouter(
+		sampleUserHandler,
+		userHandler,
+		supporterzHandler,
+		careerSelectHandler,
+		levtechRookieHandler,
+		mynaviHandler,
+		oneCareerHandler,
+		logHandler,
+	)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal("Failed to start server:", err)

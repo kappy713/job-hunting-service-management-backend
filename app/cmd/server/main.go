@@ -76,12 +76,6 @@ func main() {
 	oneCareerUsecase := usecase.NewOneCareerUsecase(oneCareerRepository, logUsecase)
 	oneCareerHandler := handler.NewOneCareerHandler(oneCareerUsecase)
 
-	// AI生成機能
-	geminiClient := client.NewGeminiClient()
-	aiGenerationRepository := repository.NewAIGenerationRepository(database)
-	aiGenerationUsecase := usecase.NewAIGenerationUsecase(aiGenerationRepository, geminiClient)
-	aiGenerationHandler := handler.NewAIGenerationHandler(aiGenerationUsecase)
-
 	// ES API関連のDI ---
 	profileRepository := repository.NewProfileRepository(database)
 	profileUsecase := usecase.NewProfileUsecase(profileRepository, logUsecase)

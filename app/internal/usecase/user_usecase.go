@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -57,7 +59,7 @@ func (u *userUsecase) UpdateUserServices(c *gin.Context, userID string, services
 			// AI生成を実行（エラーが発生してもサービス更新は成功とする）
 			if _, err := u.aiUsecase.GenerateServiceProfiles(c, userUUID, convertedServices); err != nil {
 				// AI生成エラーはログに記録するが、処理は継続
-				// TODO: ログ出力を追加
+				fmt.Printf("AI generation failed for user %s: %v\n", userUUID, err)
 			}
 		}
 	}

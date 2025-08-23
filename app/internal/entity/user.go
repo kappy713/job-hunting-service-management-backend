@@ -41,7 +41,25 @@ type UserData struct {
 	Services      []string   `json:"services"`
 }
 
+// CreateUser専用の構造体（services以外の項目）
+type CreateUserData struct {
+	LastName      string     `json:"last_name" binding:"required"`
+	FirstName     string     `json:"first_name" binding:"required"`
+	BirthDate     *time.Time `json:"birth_date,omitempty"`
+	Age           int        `json:"age" binding:"required,min=0,max=150"`
+	University    string     `json:"university" binding:"required"`
+	Category      string     `json:"category" binding:"required"`
+	Faculty       string     `json:"faculty" binding:"required"`
+	Grade         int        `json:"grade" binding:"required,min=1,max=10"`
+	TargetJobType string     `json:"target_job_type" binding:"required"`
+}
+
 type UpdateUserRequest struct {
 	UserID string   `json:"user_id" binding:"required"`
 	Data   UserData `json:"data" binding:"required"`
+}
+
+type CreateUserRequest struct {
+	UserID string         `json:"user_id" binding:"required"`
+	Data   CreateUserData `json:"data" binding:"required"`
 }

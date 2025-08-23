@@ -50,6 +50,7 @@ func NewRouter(
 	userRoutes := r.Group("/api/users")
 	{
 		userRoutes.POST("/services", uh.UpdateUserServices) // 新しいエンドポイント
+		userRoutes.POST("", uh.CreateUser)
 	}
 
 	// サポーターズ

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -10,8 +11,11 @@ import (
 )
 
 type UserRepository interface {
+	//ユーザーIDとサービスリストを基に既存ユーザーの情報を更新
 	UpdateUserServices(c *gin.Context, userID string, services []string) error
-	UpdateUser(c *gin.Context, user *entity.User) (*entity.User, error)
+	//新しいユーザー情報をデータベースに保存
+	CreateUser(c *gin.Context, user *entity.User) error
+	UpdateUser(c *gin.Context, userID string, updateData map[string]interface{}) (*entity.User, error)
 }
 
 type userRepository struct {
@@ -37,18 +41,37 @@ func (r *userRepository) UpdateUserServices(c *gin.Context, userID string, servi
 	return result.Error
 }
 
-func (r *userRepository) UpdateUser(c *gin.Context, user *entity.User) (*entity.User, error) {
-	// user_idで既存レコードを更新
-	// Gradeが0の場合は除外して更新
-	var result *gorm.DB
-	if user.Grade == 0 {
-		result = r.db.Omit("grade").Save(user)
-	} else {
-		result = r.db.Save(user)
-	}
+func (r *userRepository) CreateUser(c *gin.Context, user *entity.User) error {
+	// GORMのCreateメソッドを使用してユーザーをデータベースに保存
+	result := r.db.WithContext(c).Create(user)
+	return result.Error
+}
 
+func (r *userRepository) UpdateUser(c *gin.Context, userID string, updateData map[string]interface{}) (*entity.User, error) {
+	// user_idで既存レコードを検索
+	var existingUser entity.User
+	result := r.db.Where("user_id = ?", userID).First(&existingUser)
 	if result.Error != nil {
+		// レコードが見つからない場合はエラーを返す
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("user not found: %w", result.Error)
+		}
 		return nil, result.Error
 	}
-	return user, nil
+
+	// 更新日時を追加
+	updateData["updated_at"] = time.Now()
+
+	// レコードが存在する場合のみ更新を実行
+	if err := r.db.Model(&existingUser).Updates(updateData).Error; err != nil {
+		return nil, err
+	}
+
+	// 更新されたレコードを再度取得して返す
+	var updatedUser entity.User
+	if err := r.db.Where("user_id = ?", userID).First(&updatedUser).Error; err != nil {
+		return nil, err
+	}
+
+	return &updatedUser, nil
 }

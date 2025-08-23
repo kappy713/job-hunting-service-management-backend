@@ -27,7 +27,13 @@ func Run() error {
 	entities := []interface{}{
 		&entity.SampleUser{},
 		&entity.User{},
-		// 新しいエンティティはここに追加
+		&entity.Profile{}, // ここに新しいエンティティを追加
+		&entity.Log{},
+		&entity.Supporterz{},
+		&entity.CareerSelect{},
+		&entity.OneCareer{},
+		&entity.LevtechRookie{},
+		&entity.Mynavi{},
 	}
 
 	// 各エンティティのマイグレーション状況をチェック

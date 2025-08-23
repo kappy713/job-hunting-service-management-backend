@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -48,6 +49,30 @@ func NewAIGenerationRepository(db *gorm.DB) AIGenerationRepository {
 	return &aiGenerationRepository{db: db}
 }
 
+// logsテーブルのupdated_atを更新するヘルパーメソッド
+func (r *aiGenerationRepository) updateLogTimestamp(tx *gorm.DB, userID uuid.UUID, targetTable string, fieldNames []string) error {
+	now := time.Now()
+
+	// 各フィールドごとにログエントリを作成
+	for _, fieldName := range fieldNames {
+		log := &entity.Log{
+			ID:          uuid.New(),
+			UserID:      userID,
+			TargetTable: targetTable,
+			FieldName:   fieldName,
+			UpdatedAt:   now,
+		}
+
+		// 既存のレコードを更新するか、新しいレコードを作成
+		if err := tx.Where("user_id = ? AND target_table = ? AND field_name = ?", userID, targetTable, fieldName).
+			Assign(entity.Log{UpdatedAt: now}).
+			FirstOrCreate(log).Error; err != nil {
+			return fmt.Errorf("failed to update log timestamp for field %s: %w", fieldName, err)
+		}
+	}
+	return nil
+}
+
 func (r *aiGenerationRepository) GetUserByID(ctx context.Context, userID uuid.UUID) (*entity.User, error) {
 	var user entity.User
 	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).First(&user).Error; err != nil {
@@ -79,8 +104,36 @@ func (r *aiGenerationRepository) SaveSupporterzData(ctx context.Context, userID 
 
 	r.mapSupporterzFields(data, supporterzData)
 
-	if err := r.db.WithContext(ctx).Save(supporterzData).Error; err != nil {
+	// トランザクションを開始
+	tx := r.db.WithContext(ctx).Begin()
+	if tx.Error != nil {
+		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// サービスデータを保存
+	if err := tx.Save(supporterzData).Error; err != nil {
+		tx.Rollback()
 		return fmt.Errorf("failed to save supporterz data: %w", err)
+	}
+
+	// logsテーブルのupdated_atを更新
+	supporterzFields := []string{
+		"career_vision", "self_promotion", "skills", "skill_descriptions",
+		"intern_experiences", "intern_experience_descriptions", "products",
+		"product_tech_stacks", "product_descriptions", "researches", "research_descriptions",
+	}
+	if err := r.updateLogTimestamp(tx, userID, "supporterz", supporterzFields); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to update log timestamp: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }
@@ -112,8 +165,38 @@ func (r *aiGenerationRepository) SaveCareerSelectData(ctx context.Context, userI
 
 	r.mapCareerSelectFields(data, careerSelectData)
 
-	if err := r.db.WithContext(ctx).Save(careerSelectData).Error; err != nil {
+	// トランザクションを開始
+	tx := r.db.WithContext(ctx).Begin()
+	if tx.Error != nil {
+		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// サービスデータを保存
+	if err := tx.Save(careerSelectData).Error; err != nil {
+		tx.Rollback()
 		return fmt.Errorf("failed to save career select data: %w", err)
+	}
+
+	// logsテーブルのupdated_atを更新
+	careerSelectFields := []string{
+		"skills", "skill_descriptions", "company_selection_criteria",
+		"company_selection_criteria_descriptions", "career_vision", "self_promotion",
+		"research", "products", "product_descriptions", "experiences",
+		"experience_descriptions", "intern_experiences", "intern_experience_descriptions",
+		"certifications", "certification_descriptions",
+	}
+	if err := r.updateLogTimestamp(tx, userID, "career_select", careerSelectFields); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to update log timestamp: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }
@@ -139,8 +222,36 @@ func (r *aiGenerationRepository) SaveOneCareerData(ctx context.Context, userID u
 
 	r.mapOneCareerFields(data, oneCareerData)
 
-	if err := r.db.WithContext(ctx).Save(oneCareerData).Error; err != nil {
+	// トランザクションを開始
+	tx := r.db.WithContext(ctx).Begin()
+	if tx.Error != nil {
+		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// サービスデータを保存
+	if err := tx.Save(oneCareerData).Error; err != nil {
+		tx.Rollback()
 		return fmt.Errorf("failed to save one career data: %w", err)
+	}
+
+	// logsテーブルのupdated_atを更新
+	oneCareerFields := []string{
+		"skills", "skill_descriptions", "researches", "research_descriptions",
+		"intern_experiences", "intern_experience_descriptions", "products",
+		"product_descriptions", "engineer_aspiration",
+	}
+	if err := r.updateLogTimestamp(tx, userID, "one_career", oneCareerFields); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to update log timestamp: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }
@@ -158,8 +269,32 @@ func (r *aiGenerationRepository) SaveMynaviData(ctx context.Context, userID uuid
 		mynaviData.FuturePlan = val
 	}
 
-	if err := r.db.WithContext(ctx).Save(mynaviData).Error; err != nil {
+	// トランザクションを開始
+	tx := r.db.WithContext(ctx).Begin()
+	if tx.Error != nil {
+		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// サービスデータを保存
+	if err := tx.Save(mynaviData).Error; err != nil {
+		tx.Rollback()
 		return fmt.Errorf("failed to save mynavi data: %w", err)
+	}
+
+	// logsテーブルのupdated_atを更新
+	mynaviFields := []string{"self_promotion", "future_plan"}
+	if err := r.updateLogTimestamp(tx, userID, "mynavi", mynaviFields); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to update log timestamp: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }
@@ -201,8 +336,39 @@ func (r *aiGenerationRepository) SaveLevtechRookieData(ctx context.Context, user
 	r.mapLevtechRookieStringFields(data, levtechData)
 	r.mapLevtechRookieArrayFields(data, levtechData)
 
-	if err := r.db.WithContext(ctx).Save(levtechData).Error; err != nil {
+	// トランザクションを開始
+	tx := r.db.WithContext(ctx).Begin()
+	if tx.Error != nil {
+		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// サービスデータを保存
+	if err := tx.Save(levtechData).Error; err != nil {
+		tx.Rollback()
 		return fmt.Errorf("failed to save levtech rookie data: %w", err)
+	}
+
+	// logsテーブルのupdated_atを更新
+	levtechRookieFields := []string{
+		"desired_job_type", "career_aspiration", "interested_tasks", "job_requirements",
+		"interested_industries", "preferred_company_size", "interested_business_types",
+		"preferred_work_location", "skills", "skill_descriptions", "portfolio",
+		"portfolio_description", "intern_experiences", "intern_experience_descriptions",
+		"hackathon_experiences", "hackathon_experience_descriptions", "research",
+		"organization", "other", "certifications", "languages", "language_levels",
+	}
+	if err := r.updateLogTimestamp(tx, userID, "levtech_rookie", levtechRookieFields); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to update log timestamp: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }

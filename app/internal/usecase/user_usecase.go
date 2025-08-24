@@ -21,14 +21,16 @@ type UserUsecase interface {
 }
 
 type userUsecase struct {
-	ur        repository.UserRepository
-	aiUsecase AIGenerationUsecase
+	ur             repository.UserRepository
+	aiUsecase      AIGenerationUsecase
+	profileUsecase ProfileUsecase
 }
 
-func NewUserUsecase(r repository.UserRepository, aiUsecase AIGenerationUsecase) UserUsecase {
+func NewUserUsecase(r repository.UserRepository, aiUsecase AIGenerationUsecase, profileUsecase ProfileUsecase) UserUsecase {
 	return &userUsecase{
-		ur:        r,
-		aiUsecase: aiUsecase,
+		ur:             r,
+		aiUsecase:      aiUsecase,
+		profileUsecase: profileUsecase,
 	}
 }
 
@@ -180,10 +182,26 @@ func (u *userUsecase) GetUserServiceDetails(c *gin.Context, userID string) (map[
 		}
 	}
 
+	// プロフィール情報を取得
+	userUUID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID format: %v", err)
+	}
+
+	profile, err := u.profileUsecase.GetProfileByUserID(c, userUUID)
+	var profileData interface{}
+	if err != nil {
+		// プロフィールが存在しない場合はnullを設定
+		profileData = nil
+	} else {
+		profileData = profile
+	}
+
 	result := map[string]interface{}{
 		"user_id":           userID,
 		"services":          services,
 		"service_endpoints": serviceEndpoints,
+		"profile":           profileData,
 	}
 
 	return result, nil

@@ -26,9 +26,10 @@ type userHandler struct {
 	lru usecase.LevtechRookieUsecase
 	mu  usecase.MynaviUsecase
 	ocu usecase.OneCareerUsecase
+	pu  usecase.ProfileUsecase
 }
 
-func NewUserHandler(u usecase.UserUsecase, su usecase.SupporterzUsecase, csu usecase.CareerSelectUsecase, lru usecase.LevtechRookieUsecase, mu usecase.MynaviUsecase, ocu usecase.OneCareerUsecase) UserHandler {
+func NewUserHandler(u usecase.UserUsecase, su usecase.SupporterzUsecase, csu usecase.CareerSelectUsecase, lru usecase.LevtechRookieUsecase, mu usecase.MynaviUsecase, ocu usecase.OneCareerUsecase, pu usecase.ProfileUsecase) UserHandler {
 	return &userHandler{
 		uu:  u,
 		su:  su,
@@ -36,6 +37,7 @@ func NewUserHandler(u usecase.UserUsecase, su usecase.SupporterzUsecase, csu use
 		lru: lru,
 		mu:  mu,
 		ocu: ocu,
+		pu:  pu,
 	}
 }
 
@@ -189,6 +191,15 @@ func (h *userHandler) GetUserServiceDetails(c *gin.Context) {
 				serviceData["career_select"] = gin.H{"error": err.Error()}
 			}
 		}
+	}
+
+	// プロフィール情報を取得
+	profile, err := h.pu.GetProfileByUserID(c, userUUID)
+	if err != nil {
+		// プロフィールが存在しない場合はnullを設定
+		serviceData["profile"] = nil
+	} else {
+		serviceData["profile"] = profile
 	}
 
 	c.JSON(http.StatusOK, gin.H{

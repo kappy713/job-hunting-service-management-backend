@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"job-hunting-service-management-backend/app/infrastructure/client"
@@ -94,7 +95,14 @@ func main() {
 		profileHandler,
 	)
 
-	if err := r.Run(":8080"); err != nil {
+	// ポート番号を環境変数から取得（Renderでは必須）
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // ローカル開発用のデフォルト
+	}
+
+	log.Printf("Starting server on port %s", port)
+	if err := r.Run(":" + port); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
 }

@@ -16,6 +16,8 @@ type UserUsecase interface {
 	CreateUser(c *gin.Context, userID uuid.UUID, req entity.CreateUserData) (*entity.User, error)
 	UpdateUser(c *gin.Context, userID uuid.UUID, req entity.UserData) (*entity.User, error)
 	GetUserByID(c *gin.Context, userID string) (*entity.User, error)
+	GetUserServices(c *gin.Context, userID string) ([]string, error)
+	GetUserServiceDetails(c *gin.Context, userID string) (map[string]interface{}, error)
 }
 
 type userUsecase struct {
@@ -139,4 +141,50 @@ func (u *userUsecase) GetUserByID(c *gin.Context, userID string) (*entity.User, 
 	// ここでビジネスロジックを追加（例：データ変換、追加のチェックなど）
 
 	return user, nil
+}
+
+func (u *userUsecase) GetUserServices(c *gin.Context, userID string) ([]string, error) {
+	user, err := u.ur.GetUserByID(c, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// user.Servicesがpq.StringArrayの場合、[]stringに変換
+	services := make([]string, len(user.Services))
+	copy(services, user.Services)
+
+	return services, nil
+}
+
+func (u *userUsecase) GetUserServiceDetails(c *gin.Context, userID string) (map[string]interface{}, error) {
+	// ユーザーのサービス一覧を取得
+	services, err := u.GetUserServices(c, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// サービスリストとAPIエンドポイントのマッピングを返す
+	serviceEndpoints := make(map[string]string)
+	for _, serviceName := range services {
+		switch serviceName {
+		case "サポーターズ":
+			serviceEndpoints["supporterz"] = "/api/supporterz/" + userID
+		case "マイナビ":
+			serviceEndpoints["mynavi"] = "/api/mynavi/" + userID
+		case "レバテックルーキー":
+			serviceEndpoints["levtech_rookie"] = "/api/levtech-rookie/" + userID
+		case "ワンキャリア":
+			serviceEndpoints["one_career"] = "/api/one-career/" + userID
+		case "キャリアセレクト":
+			serviceEndpoints["career_select"] = "/api/career-select/" + userID
+		}
+	}
+
+	result := map[string]interface{}{
+		"user_id":           userID,
+		"services":          services,
+		"service_endpoints": serviceEndpoints,
+	}
+
+	return result, nil
 }

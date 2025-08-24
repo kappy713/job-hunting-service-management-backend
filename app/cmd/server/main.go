@@ -54,7 +54,6 @@ func main() {
 	// UserUsecaseにAI生成機能を依存として渡す
 	userRepository := repository.NewUserRepository(database)
 	userUsecase := usecase.NewUserUsecase(userRepository, aiGenerationUsecase)
-	userHandler := handler.NewUserHandler(userUsecase)
 
 	supporterzRepository := repository.NewSupporterzRepository(database)
 	supporterzUsecase := usecase.NewSupporterzUsecase(supporterzRepository, logUsecase)
@@ -75,6 +74,9 @@ func main() {
 	oneCareerRepository := repository.NewOneCareerRepository(database)
 	oneCareerUsecase := usecase.NewOneCareerUsecase(oneCareerRepository, logUsecase)
 	oneCareerHandler := handler.NewOneCareerHandler(oneCareerUsecase)
+
+	// UserHandlerを全てのサービスUsecaseと一緒に初期化
+	userHandler := handler.NewUserHandler(userUsecase, supporterzUsecase, careerSelectUsecase, levtechRookieUsecase, mynaviUsecase, oneCareerUsecase)
 
 	// ES API関連のDI ---
 	profileRepository := repository.NewProfileRepository(database)

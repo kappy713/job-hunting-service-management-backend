@@ -49,6 +49,8 @@ func NewRouter(
 
 	// 新しいエンドポイント
 	r.GET("/api/users/:userID", uh.GetUserByID)
+	r.GET("/api/user/:userID/services", uh.GetUserServices)
+	r.GET("/api/user/:userID/service-details", uh.GetUserServiceDetails)
 	// ユーザー
 	r.POST("/api/user", uh.UpdateUser)
 	userRoutes := r.Group("/api/users")

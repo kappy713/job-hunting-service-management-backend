@@ -4,6 +4,7 @@
 就活サービスの情報(自己PRやキャリア観、スキルなど)を一元管理するプロダクト<br>
 キャリマネで書いたESから複数の就活サービスに対応する項目を生成できる
 
+フロントエンドのリポジトリは[こちら](https://github.com/kappy713/job-hunting-service-management-frontend)
 
 ## 開発環境
 - Go：1.24.0

@@ -1,4 +1,9 @@
-# 就活サービス管理(仮)のバックエンドリポジトリ
+# キャリマネのバックエンドリポジトリ
+
+## キャリマネとは？
+就活サービスの情報(自己PRやキャリア観、スキルなど)を一元管理するプロダクト<br>
+キャリマネで書いたESから複数の就活サービスに対応する項目を生成できる
+
 
 ## 開発環境
 - Go：1.24.0
@@ -16,13 +21,17 @@ go mod tidy
 
 ### 3. 環境変数の設定
 ```
-DATABASE_URL=DATABASE_URL
+DATABASE_URL=YOUR_DATABASE_URL
+FRONTEND_URL=YOUR_FRONTEND_URL
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+PORT=YOUR_PORT
 ```
 
 ### 4. 開発用サーバーの起動
 ※環境変数が正しく設定されていない場合は開発用サーバーが起動しません※
 ```
-go run app/cmd/server/main.go
+make start
+// go run ./app/cmd/server/main.go
 ```
 
 上記コマンド実行後、http://localhost:8080/ にアクセス<br>
